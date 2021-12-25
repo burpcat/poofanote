@@ -14,16 +14,24 @@ def help_func():
 
 def add_task(main_input):
     with open('task.txt','a+') as task:
-        task.write('\n'+main_input[2] +' '+ main_input[3])
+        msg = '\n'+main_input[2] +' '+ main_input[3]
+        
+        current_len = count_tasks('task.txt')
+        if(current_len == 1):
+            task.write(msg.lstrip())
+        else:
+            task.write(msg)
         
         print("Added Task :" +' "' +main_input[3]+ '"' +' with priority '+ main_input[2]) # main_input[2] --> priority, main_input[3] --> message
-
+        
 def list_task():
     # This function lists out all the tasks which are present in the tasks.txt file
     internal_count =0
     with open('task.txt','a+') as task:
         task.seek(0)
         task_list = task.read().split("\n") # splitting each line
+        if(task_list[1]==""): # empty lines are considered here
+            print('There are no pending tasks!')
         for i in range(0,11):
             for j in range(1,len(task_list)):
                 priority_num = int(task_list[j].split()[0])
@@ -32,6 +40,7 @@ def list_task():
                     task_name = ' '.join(task_list[j].split()[1:]) # using string splitting we create task name
                     print("{0}. {1} [{2}]".format(internal_count,task_name,priority_num))
 
+    return(len(task_list))
     task.close()
 
 def list_task_completed():
@@ -68,10 +77,9 @@ def done_task(done_num):
                 if ( i == priority_num):
     
                     internal_count = internal_count +1
-    
                     if(internal_count == int(done_num)):
                         task_which_is_done = task_list[j]
-
+    
     with open('task.txt','r+') as task:
     
         i=0
@@ -81,9 +89,11 @@ def done_task(done_num):
         for line in lines:
             i =i+1
             main_clause = line.split("\n")[0]
-            if main_clause != task_which_is_done:
+            if main_clause != task_which_is_done: 
                 task.write(main_clause)
-                if(i<len(lines)): # to fix list index going out of range due to newline character
+                if(i==2 and (len(lines)-1)== 2): # used this pass statement to fix newline character problem
+                    pass
+                elif(i<=len(lines)-1):
                     task.write("\n")
         task.truncate()
     
@@ -111,21 +121,17 @@ def count_tasks(f_name):
 def report_func():
 
     # This function returns the report of the overall To-Do CLI coagulating all the required functions
-    try:
-        no_of_tasks = count_tasks('task.txt')
-        print("Pendind: {0}".format(no_of_tasks))
-        list_task()
-        print("\n")
-    except:
-        print("Pendind: 0")
     
-    try:
-        no_of_tasks = count_tasks('completed.txt')
-        print("Completed: {0}".format(no_of_tasks))
-        list_task_completed()
-        print("\n")
-    except:
-        print("Completed: 0")
+    no_of_tasks = count_tasks('task.txt')
+    print("Pending: {0}".format(no_of_tasks))
+    list_task()
+    print("\n")
+    
+    
+    no_of_tasks = count_tasks('completed.txt')
+    print("Completed: {0}".format(no_of_tasks))
+    list_task_completed()
+    print("\n")
 
 ### End of Functions ###
 
@@ -137,7 +143,7 @@ if(len(sys.argv)==1):
 
 try:
     # The other part is used in a try: indent because, when no arguments are passed, the interpretor returns a error message
-    
+
     definer = sys.argv[1] 
     # a definer varibale is used to understand the function given by the user
 
@@ -145,15 +151,31 @@ try:
         help_func()
 
     elif (definer=="add"):
-        add_task(sys.argv) # here sys.argv is taken in at function as main input
+        if(len(sys.argv)<=3):
+            print("Error: Missing tasks string. Nothing added!")
+        else:
+            add_task(sys.argv) # here sys.argv is taken in at function as main input
 
     elif (definer=="done"):
-        task_which_is_done = done_task(sys.argv[2])
-        task_complete_add(task_which_is_done)
+        try:
+            if(len(sys.argv)==2):
+                print('Error: Missing NUMBER for marking tasks as done.')
+            else:
+                task_which_is_done = done_task(sys.argv[2])
+                task_complete_add(task_which_is_done)
+        except:
+            print(f'Error: no incomplete item with index {sys.argv[2]} exists.')
+            pass
 
     elif (definer=="del"):
-        task_which_is_done = done_task(sys.argv[2])
-        print(f'Deleted task #{sys.argv[2]}')
+        try:
+            if(len(sys.argv)==2):
+                print('Error: Missing NUMBER for deleting tasks.')
+            else:    
+                task_which_is_done = done_task(sys.argv[2])
+                print(f'Deleted task #{sys.argv[2]}')
+        except:
+            print('Error: task with index {0} does not exist. Nothing deleted.'.format(sys.argv[2]))
         # here for the delete command, we use the same function used for "done" but we dont parse the 
         # received data to the task_complete_add() function which adds the data to the completed.txt file
 
@@ -162,5 +184,9 @@ try:
 
     elif (definer=="report"):
         report_func()
+    
+    # elif(definer == "tester"):
+    #     count_val = count_tasks('task.txt')
+    #     print(count_val)
 except:
     pass
