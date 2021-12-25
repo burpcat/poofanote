@@ -33,7 +33,6 @@ def list_task():
     task.close()
 
 def done_task(done_num):
-    done_num = int(done_num) # Variable is passed as a string, and therefore needs to be converted to int
     internal_count =0
     with open('task.txt','a+') as task:
         task.seek(0)
@@ -43,14 +42,13 @@ def done_task(done_num):
                 priority_num = int(task_list[j].split()[0])
                 if ( i == priority_num):
                     internal_count = internal_count +1
-                    if(internal_count == done_num):
-                        task_name = ' '.join(task_list[j].split()[1:]) # using string splitting we create task name
-                        print("{0}. {1} [{2}]".format(internal_count,task_name,priority_num))
+                    if(internal_count == int(done_num)):
                         task_which_is_done = task_list[j]
 
     with open('completed.txt','a+') as completed:
-        completed.write(task_which_is_done)
-                    
+        completed.seek(0)
+        completed.write("\n"+task_which_is_done)
+
     task.close()
     completed.close()
 
