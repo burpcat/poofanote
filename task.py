@@ -19,6 +19,7 @@ def add_task(main_input):
         print("Added Task :" +' "' +main_input[3]+ '"' +' with priority '+ main_input[2]) # main_input[2] --> priority, main_input[3] --> message
 
 def list_task():
+    # This function lists out all the tasks which are present in the tasks.txt file
     internal_count =0
     with open('task.txt','a+') as task:
         task.seek(0)
@@ -33,8 +34,26 @@ def list_task():
 
     task.close()
 
+def list_task_completed():
+
+    # This function lists out all the tasks which are present in the completed.txt file
+    internal_count =0
+    with open('completed.txt','a+') as completed:
+        completed.seek(0)
+        completed_list = completed.read().split("\n") # splitting each line
+        for i in range(0,11):
+            for j in range(1,len(completed_list)):
+                priority_num = int(completed_list[j].split()[0])
+                if ( i == priority_num):
+                    internal_count = internal_count +1
+                    task_name = ' '.join(completed_list[j].split()[1:]) # using string splitting we create task name
+                    print("{0}. {1} [{2}]".format(internal_count,task_name,priority_num))
+
+    completed.close()
+
 def done_task(done_num):
     
+    # This function removes the tasks which are mentioned to be completed by the user
     internal_count =0
     
     with open('task.txt','a+') as task:
@@ -73,7 +92,7 @@ def done_task(done_num):
 
 def task_complete_add(task_which_is_done):
    
-    # Function adds the completed tasks to the completed.txt file
+    # Function adds the output of the done_task() function to the completed.txt file
     with open('completed.txt','a+') as completed:
         completed.seek(0)
         completed.write("\n"+task_which_is_done)
@@ -81,46 +100,67 @@ def task_complete_add(task_which_is_done):
 
     completed.close()
 
+def count_tasks(f_name):
+    # This function counts the no of tasks present either in tasks.txt file or completed.txt file based on the inputs
+    with open(f_name,'r') as file:
+        file.seek(0)
+        file_len = len(file.read().split("\n"))-1
+    file.close()
+    return file_len
+
 def report_func():
-    
-    with open('task.txt','a+') as task:
-        task.seek(0)
-        task_list = task.read().split("\n")
-    
-    task.close()
-    print("Pendind: {0}".format(len(task_list)-1))
-    
-    list_task()
 
+    # This function returns the report of the overall To-Do CLI coagulating all the required functions
+    try:
+        no_of_tasks = count_tasks('task.txt')
+        print("Pendind: {0}".format(no_of_tasks))
+        list_task()
+        print("\n")
+    except:
+        print("Pendind: 0")
     
-    
-
+    try:
+        no_of_tasks = count_tasks('completed.txt')
+        print("Completed: {0}".format(no_of_tasks))
+        list_task_completed()
+        print("\n")
+    except:
+        print("Completed: 0")
 
 ### End of Functions ###
+
+
 
 if(len(sys.argv)==1):
     help_func()
 
-# here definer is the command which follows after ./task
-definer = sys.argv[1] 
 
-if(definer == "help") :
-    help_func()
+try:
+    # The other part is used in a try: indent because, when no arguments are passed, the interpretor returns a error message
+    
+    definer = sys.argv[1] 
+    # a definer varibale is used to understand the function given by the user
 
-elif (definer=="add"):
-    add_task(sys.argv) # here sys.argv is taken in at function as main input
+    if(definer == "help") :
+        help_func()
 
-elif (definer=="done"):
-    task_which_is_done = done_task(sys.argv[2])
-    task_complete_add(task_which_is_done)
+    elif (definer=="add"):
+        add_task(sys.argv) # here sys.argv is taken in at function as main input
 
-elif (definer=="del"):
-    task_which_is_done = done_task(sys.argv[2])
-    # here for the delete command, we use the same function used for "done" but we dont parse the 
-    # received data to the task_complete_add() function which adds the data to the completed.txt file
+    elif (definer=="done"):
+        task_which_is_done = done_task(sys.argv[2])
+        task_complete_add(task_which_is_done)
 
-elif (definer=="ls"):
-    list_task()
+    elif (definer=="del"):
+        task_which_is_done = done_task(sys.argv[2])
+        print(f'Deleted task #{sys.argv[2]}')
+        # here for the delete command, we use the same function used for "done" but we dont parse the 
+        # received data to the task_complete_add() function which adds the data to the completed.txt file
 
-elif (definer=="report"):
-    report_func()
+    elif (definer=="ls"):
+        list_task()
+
+    elif (definer=="report"):
+        report_func()
+except:
+    pass
