@@ -14,25 +14,45 @@ def help_func():
 
 def add_task(main_input):
     with open('task.txt','a+') as task:
-        # here identifier symbols are placed in between to simplify the process of parsing the data
-        task.write("\n"+ '"' +main_input[3]+ '"' +':'+ ' with priority '+ main_input[2]+';')
+        task.write('\n'+main_input[2] +' '+ main_input[3])
+        print("Added Task :" +' "' +main_input[3]+ '"' +' with priority '+ main_input[2]) # main_input[2] --> priority, main_input[3] --> message
 
 def list_task():
     internal_count =0
     with open('task.txt','a+') as task:
         task.seek(0)
-        task_list = task.read().split(";")
-        for i in range(10):
-            for j in range(len(task_list)-1):
-                priority_num = int(task_list[j].split()[-1])
-                if(i == priority_num):
-                    internal_count = internal_count+1
-                    print(f'{internal_count}. {task_list[j].split(":")[0][2:-1]} [{priority_num}]') # using list splitting & string slicing we print the output
+        task_list = task.read().split("\n") # splitting each line
+        for i in range(0,11):
+            for j in range(1,len(task_list)):
+                priority_num = int(task_list[j].split()[0])
+                if ( i == priority_num):
+                    internal_count = internal_count +1
+                    task_name = ' '.join(task_list[j].split()[1:]) # using string splitting we create task name
+                    print("{0}. {1} [{2}]".format(internal_count,task_name,priority_num))
 
     task.close()
 
 def done_task(done_num):
-    pass
+    done_num = int(done_num) # Variable is passed as a string, and therefore needs to be converted to int
+    internal_count =0
+    with open('task.txt','a+') as task:
+        task.seek(0)
+        task_list = task.read().split("\n") # splitting each line
+        for i in range(0,11):
+            for j in range(1,len(task_list)):
+                priority_num = int(task_list[j].split()[0])
+                if ( i == priority_num):
+                    internal_count = internal_count +1
+                    if(internal_count == done_num):
+                        task_name = ' '.join(task_list[j].split()[1:]) # using string splitting we create task name
+                        print("{0}. {1} [{2}]".format(internal_count,task_name,priority_num))
+                        task_which_is_done = task_list[j]
+
+    with open('completed.txt','a+') as completed:
+        completed.write(task_which_is_done)
+                    
+    task.close()
+    completed.close()
 
 ### End of Functions ###
 
@@ -46,14 +66,13 @@ if(definer == "help") :
     help_func()
 
 elif (definer=="add"):
-    print('add-printed')
     add_task(sys.argv) # here sys.argv is taken in at function as main input
-    # completed beta phase of the add function
 
 elif (definer=="done"):
-    print("removing the one with the present serial number")
     done_task(sys.argv[2])
 
+elif (definer=="del"):
+    pass
 
 elif (definer=="ls"):
     list_task()
