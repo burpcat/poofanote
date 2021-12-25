@@ -22,7 +22,7 @@ def add_task(main_input):
         else:
             task.write(msg)
         
-        print("Added Task :" +' "' +main_input[3]+ '"' +' with priority '+ main_input[2]) # main_input[2] --> priority, main_input[3] --> message
+        print("Added Task:" +' "' +main_input[3]+ '"' +' with priority '+ main_input[2]) # main_input[2] --> priority, main_input[3] --> message
         
 def list_task():
     # This function lists out all the tasks which are present in the tasks.txt file
@@ -123,8 +123,25 @@ def report_func():
     # This function returns the report of the overall To-Do CLI coagulating all the required functions
     
     no_of_tasks = count_tasks('task.txt')
-    print("Pending: {0}".format(no_of_tasks))
-    list_task()
+    # print("Pending: {0}".format(no_of_tasks))
+    internal_count =0
+    with open('task.txt','a+') as task:
+        task.seek(0)
+        task_list = task.read().split("\n") # splitting each line
+        # if(task_list[1]==""): # empty lines are considered here
+        #     print('There are no pending tasks!')
+        if(len(task_list)==2):
+            print("Pending: 0")
+        else:
+            print("Pending: {0}".format(no_of_tasks))
+        for i in range(0,11):
+            for j in range(1,len(task_list)):
+                priority_num = int(task_list[j].split()[0])
+                if ( i == priority_num):
+                    internal_count = internal_count +1
+                    task_name = ' '.join(task_list[j].split()[1:]) # using string splitting we create task name
+                    print("{0}. {1} [{2}]".format(internal_count,task_name,priority_num))
+    
     print("\n")
     
     
