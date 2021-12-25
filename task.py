@@ -15,6 +15,7 @@ def help_func():
 def add_task(main_input):
     with open('task.txt','a+') as task:
         task.write('\n'+main_input[2] +' '+ main_input[3])
+        
         print("Added Task :" +' "' +main_input[3]+ '"' +' with priority '+ main_input[2]) # main_input[2] --> priority, main_input[3] --> message
 
 def list_task():
@@ -45,9 +46,23 @@ def done_task(done_num):
                     if(internal_count == int(done_num)):
                         task_which_is_done = task_list[j]
 
+    with open('task.txt','r+') as task:
+        i=0
+        lines = task.readlines()
+        task.seek(0)
+        for line in lines:
+            i =i+1
+            main_clause = line.split("\n")[0]
+            if main_clause != task_which_is_done:
+                task.write(main_clause)
+                if(i<len(lines)): # to fix list index going out of range due to newline character
+                    task.write("\n")
+        task.truncate()
+
     with open('completed.txt','a+') as completed:
         completed.seek(0)
         completed.write("\n"+task_which_is_done)
+        print('Marked item as done.')
 
     task.close()
     completed.close()
